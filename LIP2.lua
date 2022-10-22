@@ -37,6 +37,10 @@ local LIP = {};
 ---@param s string
 ---@return string
 local function trim(s)
+	if (s == nil) then
+		return ""
+	end
+
 	return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
@@ -56,7 +60,7 @@ function LIP.load(fileName)
 				data[section] = data[section] or {};
 			else
 				local param, value = line:match("^(.*)=(.*)$");
-				if(param ~= nil and param ~= "" and value ~= nil)then
+				if(param ~= nil and param ~= "")then
 					param = trim(param)
 					value = trim(value)
 					if(tonumber(value))then
