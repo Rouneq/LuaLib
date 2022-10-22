@@ -1,23 +1,23 @@
 --[[
-	Copyright (c) 2012 Carreras Nicolas
-	
-	Permission is hereby granted, free of charge, to any person obtaining a copy
-	of this software and associated documentation files (the "Software"), to deal
-	in the Software without restriction, including without limitation the rights
-	to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	copies of the Software, and to permit persons to whom the Software is
-	furnished to do so, subject to the following conditions:
-	
-	The above copyright notice and this permission notice shall be included in all
-	copies or substantial portions of the Software.
-	
-	THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-	SOFTWARE.
+    Copyright (c) 2012 Carreras Nicolas
+    
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+    
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+    
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
 --]]
 --- Lua INI Parser.
 -- It has never been that simple to use INI files with Lua.
@@ -25,7 +25,7 @@
 
 -- Additions by Special Ed
     -- Sorting section/keys before saving ini files
-	-- Expanded pattern used for loading keys (underscores, periods, apostrophes)
+    -- Expanded pattern used for loading keys (underscores, periods, apostrophes)
 
 -- Corrections by Rouneq
     -- Fixed an issue with handling "empty" values
@@ -37,79 +37,79 @@ local LIP = {};
 ---@param s string
 ---@return string
 local function trim(s)
-	if (s == nil) then
-		return ""
-	end
+    if (s == nil) then
+        return ""
+    end
 
-	return (s:gsub("^%s*(.-)%s*$", "%1"))
+    return (s:gsub("^%s*(.-)%s*$", "%1"))
 end
 
 --- Returns a table containing all the data from the INI file.
 ---@param fileName string The name of the INI file to parse. [string]
 ---@return table @The table containing all data from the INI file. [table]
 function LIP.load(fileName)
-	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
-	local file = assert(io.open(fileName, 'r'), 'Error loading file : ' .. fileName);
-	local data = {};
-	local section;
-	for line in file:lines() do
-		if (not line:match("^;") and not line:match("^%s*$")) then
-			local tempSection = line:match('^%[([^%[%]]+)%]$');
-			if(tempSection)then
-				section = tonumber(tempSection) and tonumber(tempSection) or tempSection;
-				data[section] = data[section] or {};
-			else
-				local param, value = line:match("^(.*)=(.*)$");
-				if(param ~= nil and param ~= "")then
-					param = trim(param)
-					value = trim(value)
-					if(tonumber(value))then
-						value = tonumber(value);
-					elseif(value == 'true')then
-						value = true;
-					elseif(value == 'false')then
-						value = false;
-					end
-					if(tonumber(param))then
-						param = tonumber(param);
-					end
-					data[section][param] = value;
-				end
-			end
-		end
-	end
-	file:close();
-	return data;
+    assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
+    local file = assert(io.open(fileName, 'r'), 'Error loading file : ' .. fileName);
+    local data = {};
+    local section;
+    for line in file:lines() do
+        if (not line:match("^;") and not line:match("^%s*$")) then
+            local tempSection = line:match('^%[([^%[%]]+)%]$');
+            if(tempSection)then
+                section = tonumber(tempSection) and tonumber(tempSection) or tempSection;
+                data[section] = data[section] or {};
+            else
+                local param, value = line:match("^(.*)=(.*)$");
+                if(param ~= nil and param ~= "")then
+                    param = trim(param)
+                    value = trim(value)
+                    if(tonumber(value))then
+                        value = tonumber(value);
+                    elseif(value == 'true')then
+                        value = true;
+                    elseif(value == 'false')then
+                        value = false;
+                    end
+                    if(tonumber(param))then
+                        param = tonumber(param);
+                    end
+                    data[section][param] = value;
+                end
+            end
+        end
+    end
+    file:close();
+    return data;
 end
 
 --- Saves all the data from a table to an INI file.
 ---@param fileName string The name of the INI file to fill. [string]
 ---@param data table The table containing all the data to store. [table]
 function LIP.save(fileName, data)
-	assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
-	assert(type(data) == 'table', 'Parameter "data" must be a table.');
-	local file = assert(io.open(fileName, 'w+b'), 'Error loading file :' .. fileName);
-	local contents = '';
+    assert(type(fileName) == 'string', 'Parameter "fileName" must be a string.');
+    assert(type(data) == 'table', 'Parameter "data" must be a table.');
+    local file = assert(io.open(fileName, 'w+b'), 'Error loading file :' .. fileName);
+    local contents = '';
 
-	-- sort the section keys
-	local sections = {}
-	for k, v in pairs(data) do table.insert(sections, k) end
-	table.sort(sections)
+    -- sort the section keys
+    local sections = {}
+    for k, v in pairs(data) do table.insert(sections, k) end
+    table.sort(sections)
 
-	for _, sectionKey in ipairs(sections) do
-		contents = contents .. ('[%s]\n'):format(sectionKey);
-		-- sort the keys before writing the file
-		local keys = {}
-		for k, v in pairs(data[sectionKey]) do table.insert(keys, k) end
-		table.sort(keys)
+    for _, sectionKey in ipairs(sections) do
+        contents = contents .. ('[%s]\n'):format(sectionKey);
+        -- sort the keys before writing the file
+        local keys = {}
+        for k, v in pairs(data[sectionKey]) do table.insert(keys, k) end
+        table.sort(keys)
 
-		for _, k in ipairs(keys) do
-			contents = contents .. ('%s=%s\n'):format(k, tostring(data[sectionKey][k]));
-		end
-		contents = contents .. '\n';
-	end
-	file:write(contents);
-	file:close();
+        for _, k in ipairs(keys) do
+            contents = contents .. ('%s=%s\n'):format(k, tostring(data[sectionKey][k]));
+        end
+        contents = contents .. '\n';
+    end
+    file:write(contents);
+    file:close();
 end
 
 return LIP
