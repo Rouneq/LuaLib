@@ -33,6 +33,13 @@
 ---@class LIP
 local LIP = {};
 
+--- trim implementation
+---@param s string
+---@return string
+local function trim(s)
+	return (s:gsub("^%s*(.-)%s*$", "%1"))
+end
+
 --- Returns a table containing all the data from the INI file.
 ---@param fileName string The name of the INI file to parse. [string]
 ---@return table @The table containing all data from the INI file. [table]
@@ -42,24 +49,29 @@ function LIP.load(fileName)
 	local data = {};
 	local section;
 	for line in file:lines() do
-		local tempSection = line:match('^%[([^%[%]]+)%]$');
-		if(tempSection)then
-			section = tonumber(tempSection) and tonumber(tempSection) or tempSection;
-			data[section] = data[section] or {};
-		end
-		local param, value = line:match("^([%w|_'.%s-]+)=%s-(.*)$");
-		if(param and value ~= nil)then
-			if(tonumber(value))then
-				value = tonumber(value);
-			elseif(value == 'true')then
-				value = true;
-			elseif(value == 'false')then
-				value = false;
+		if (not line:match("^;") and not line:match("^%s*$")) then
+			local tempSection = line:match('^%[([^%[%]]+)%]$');
+			if(tempSection)then
+				section = tonumber(tempSection) and tonumber(tempSection) or tempSection;
+				data[section] = data[section] or {};
+			else
+				local param, value = line:match("^(.*)=(.*)$");
+				if(param ~= nil and param ~= "" and value ~= nil)then
+					param = trim(param)
+					value = trim(value)
+					if(tonumber(value))then
+						value = tonumber(value);
+					elseif(value == 'true')then
+						value = true;
+					elseif(value == 'false')then
+						value = false;
+					end
+					if(tonumber(param))then
+						param = tonumber(param);
+					end
+					data[section][param] = value;
+				end
 			end
-			if(tonumber(param))then
-				param = tonumber(param);
-			end
-			data[section][param] = value;
 		end
 	end
 	file:close();
