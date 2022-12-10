@@ -13,7 +13,7 @@ ICaseTable = {}
 --- * keys "ABC", "abc" and "aBc" are all considered the same key.  
 --- * Setting "ABC", "abc" then "aBc" the case returned when iterating will be "aBc".
 ---@param data? table @An optional table with an initial set of data
----@return table<string, any> @A table with case insensitive lookup.
+---@return ICaseTable|table<string, any> @A table with case insensitive lookup.
 function CreateIcaseTable(data)
     -- For case preservation.
     local lookup = {}
@@ -33,7 +33,7 @@ function CreateIcaseTable(data)
         end
 
         table.sort(orderedIndex)
-        
+
         return orderedIndex
     end
 
@@ -83,7 +83,7 @@ function CreateIcaseTable(data)
         end
 
         local key,value = next(values, state)
-        
+
         return lookup[key] or key, value
     end
 
